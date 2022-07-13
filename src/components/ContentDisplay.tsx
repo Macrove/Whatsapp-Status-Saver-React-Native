@@ -2,10 +2,7 @@ import { StorageAccessFramework } from "expo-file-system";
 import { useEffect, useState } from "react";
 import { ContentDisplayProps } from "../models/interface";
 import { WHATSAPPSTATUSDIRECTORY } from "../utils/constants";
-
 import StatusImages from "./StatusImages";
-import * as FileSystem from "expo-file-system";
-import { View } from "react-native";
 import Loading from "./Loading";
 
 const ContentDisplay: React.FC<ContentDisplayProps> = ({ content }) => {
