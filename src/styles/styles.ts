@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
 const contentSelectionBar = StyleSheet.create({
   contentSelectionBarView: {
     width: window.width - 100,
-    height: 100,
+    height: 70,
     flexDirection: "row",
     justifyContent: "space-around",
     // backgroundColor: "#00000",
@@ -88,9 +88,9 @@ const statusImages = StyleSheet.create({
   },
   allSaveOptionsView: {
     width: window.width - 100,
-    height: 30,
-    bottom: 25,
-    marginBottom: 5,
+    height: 60,
+    // bottom: 25,
+    // marginBottom: 5,
     // borderWidth: 1,
     flexDirection: "row",
     justifyContent: "space-between",

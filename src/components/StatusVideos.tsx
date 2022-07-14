@@ -11,14 +11,14 @@ import { statusImages } from "../styles/styles";
 import * as FileSystem from "expo-file-system";
 import { FontAwesome } from "@expo/vector-icons";
 import {
-  ImageStatusAlbumName,
+  VideoStatusAlbumName,
   WHATSAPPDEFAULTCOLOUR,
 } from "../utils/constants";
 import { AntDesign } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import * as MediaLibrary from "expo-media-library";
 
-const StatusImages: React.FC<StatusImageProps> = ({ assetUri }) => {
+const StatusVideos: React.FC<StatusImageProps> = ({ assetUri }) => {
   const [isSaveMode, setIsSavingMode] = useState<boolean>(false);
   const [toSaveUri, setToSaveUri] = useState<string[]>([]);
   const [status, requestPermission] = MediaLibrary.usePermissions();
@@ -44,28 +44,30 @@ const StatusImages: React.FC<StatusImageProps> = ({ assetUri }) => {
     }
   };
 
-  let imageCacheFolderUri: string;
-  const getImageCacheFilesUri = async () => {
+  let videoCacheFolderUri: string;
+  const getVideosCacheFilesUri = async () => {
     const cacheDirUri = FileSystem.cacheDirectory!;
-    const relativePath = "WHATSAPP/STATUS/IMAGES";
-    imageCacheFolderUri = cacheDirUri + relativePath;
+    const relativePath = "WHATSAPP/STATUS/VIDEOS";
+    videoCacheFolderUri = cacheDirUri + relativePath;
+
     try {
-      await FileSystem.deleteAsync(imageCacheFolderUri);
+      await FileSystem.deleteAsync(videoCacheFolderUri);
     } catch (e) {
       console.log(e);
     }
+
     toSaveUri.forEach(async (uri: string) => {
       await FileSystem.copyAsync({
         from: uri,
-        to: `${imageCacheFolderUri}`,
+        to: `${videoCacheFolderUri}`,
       });
     });
 
-    const imageCacheFiles = await FileSystem.readDirectoryAsync(
-      imageCacheFolderUri
+    const videoCacheFiles = await FileSystem.readDirectoryAsync(
+      videoCacheFolderUri
     );
-    return imageCacheFiles.map(
-      (uri: string) => `${imageCacheFolderUri}/${uri}`
+    return videoCacheFiles.map(
+      (uri: string) => `${videoCacheFolderUri}/${uri}`
     );
   };
 
@@ -80,19 +82,19 @@ const StatusImages: React.FC<StatusImageProps> = ({ assetUri }) => {
         }
       }
 
-      const imageCacheFilesUri = await getImageCacheFilesUri();
-      if (imageCacheFilesUri.length) {
+      const videoCacheFilesUri = await getVideosCacheFilesUri();
+      if (videoCacheFilesUri.length) {
         let createdAssets: MediaLibrary.Asset[] = [];
-        for (let uri of imageCacheFilesUri) {
+        for (let uri of videoCacheFilesUri) {
           const newAsset = await MediaLibrary.createAssetAsync(uri);
           createdAssets.push(newAsset);
         }
 
-        let album = await MediaLibrary.getAlbumAsync(ImageStatusAlbumName);
+        let album = await MediaLibrary.getAlbumAsync(VideoStatusAlbumName);
         if (!album) {
           //false=>move assets, don't copy
           album = await MediaLibrary.createAlbumAsync(
-            ImageStatusAlbumName,
+            VideoStatusAlbumName,
             createdAssets[0],
             true
           );
@@ -101,12 +103,12 @@ const StatusImages: React.FC<StatusImageProps> = ({ assetUri }) => {
 
         await MediaLibrary.addAssetsToAlbumAsync(createdAssets, album, true);
         await MediaLibrary.deleteAssetsAsync(createdAssets);
-        await FileSystem.deleteAsync(imageCacheFolderUri);
+        await FileSystem.deleteAsync(videoCacheFolderUri);
       }
       cancelSave();
     } catch (e) {
       console.log(e);
-      FileSystem.deleteAsync(imageCacheFolderUri);
+      FileSystem.deleteAsync(videoCacheFolderUri);
       cancelSave();
       const err = new Error();
       console.log(err.stack);
@@ -204,4 +206,4 @@ const StatusImages: React.FC<StatusImageProps> = ({ assetUri }) => {
   );
 };
 
-export default StatusImages;
+export default StatusVideos;

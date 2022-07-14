@@ -6,7 +6,7 @@ import ContentDisplay from "../components/ContentDisplay";
 import { styles } from "../styles/styles";
 
 const Home: React.FC = () => {
-  const [displayContent, setDisplayContent] = useState<string>("Images");
+  const [displayContent, setDisplayContent] = useState<string>("image");
 
   const [message, setMessage] = useState<string | null>(null);
 
@@ -16,7 +16,7 @@ const Home: React.FC = () => {
   return (
     <View style={styles.homeView}>
       <ContentSelectionBar
-        content={"image"}
+        content={displayContent}
         changeContent={(content) => handleChangeContent(content)}
       />
       <ContentDisplay content={displayContent} />

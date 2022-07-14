@@ -24,7 +24,11 @@ const ContentSelectionBar: React.FC<ContentSelectionBarProps> = ({
           <Entypo name="image" size={24} color="black" />
         </View>
       </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback onPress={() => changeContent("video")}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          changeContent("video");
+        }}
+      >
         <View
           style={
             content === "video"

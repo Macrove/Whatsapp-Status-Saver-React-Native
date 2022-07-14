@@ -4,11 +4,14 @@ import { ContentDisplayProps } from "../models/interface";
 import { WHATSAPPSTATUSDIRECTORY } from "../utils/constants";
 import StatusImages from "./StatusImages";
 import Loading from "./Loading";
+import StatusVideos from "./StatusVideos";
 
 const ContentDisplay: React.FC<ContentDisplayProps> = ({ content }) => {
   const [whatsappImageUri, setWhatsappImageUri] = useState<string[]>([]);
   const [whatsappVidUri, setWhatsappVidUri] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [oneSecPassed, setOneSecPassed] = useState<boolean>(false);
+  const [toShowLoading, setToShowLoading] = useState<boolean>(true);
 
   const getStatusMedia = async () => {
     try {
@@ -34,25 +37,23 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({ content }) => {
   };
 
   useEffect(() => {
+    setToShowLoading(isLoading || !oneSecPassed);
+  }, [oneSecPassed, isLoading]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setOneSecPassed(true);
+    }, 2000);
     getStatusMedia();
   }, []);
 
-  // const handleSave = async (uri: string) => {
-  //   const statusDir = FileSystem.documentDirectory + "WhatsApp Status";
-  //   await FileSystem.makeDirectoryAsync(statusDir, { intermediates: true });
-
-  //   await FileSystem.copyAsync({ from: uri, to: statusDir });
-  //   const assets = await FileSystem.readDirectoryAsync(statusDir);
-  //   console.log(assets, statusDir);
-  //   // setMessage("Photo saved")
-  // };
-
-  // if(content == "image")
-  if (isLoading) {
+  if (toShowLoading) {
     return <Loading />;
   }
+  if (content == "video") {
+    return <StatusVideos assetUri={whatsappVidUri} />;
+  }
   return <StatusImages assetUri={whatsappImageUri} />;
-  // return <StatusVideos/>
 };
 
 export default ContentDisplay;
