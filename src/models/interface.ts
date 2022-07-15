@@ -10,20 +10,22 @@ interface DisplayMessageProps {
 
 interface ContentSelectionBarProps {
   content: string;
-  changeContent: (contentName: string) => void;
-}
-
-interface ContentDisplayProps {
-  content: string;
+  handleChangeContent: (contentName: "images" | "videos") => void;
 }
 
 interface StatusImageProps {
   assetUri: string[];
 }
 
+interface StatusItemProps {
+  itemType: "IMAGES" | "VIDEOS";
+  albumName: string;
+  itemUri: string[];
+}
+
 export {
   DisplayMessageProps,
   ContentSelectionBarProps,
-  ContentDisplayProps,
   StatusImageProps,
+  StatusItemProps,
 };

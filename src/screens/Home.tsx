@@ -6,20 +6,13 @@ import ContentDisplay from "../components/ContentDisplay";
 import { styles } from "../styles/styles";
 
 const Home: React.FC = () => {
-  const [displayContent, setDisplayContent] = useState<string>("image");
-
   const [message, setMessage] = useState<string | null>(null);
 
   const handleHideMessage = () => setMessage(null);
-  const handleChangeContent = (content: string) => setDisplayContent(content);
 
   return (
     <View style={styles.homeView}>
-      <ContentSelectionBar
-        content={displayContent}
-        changeContent={(content) => handleChangeContent(content)}
-      />
-      <ContentDisplay content={displayContent} />
+      <ContentDisplay />
 
       {message ? (
         <DisplayMessage

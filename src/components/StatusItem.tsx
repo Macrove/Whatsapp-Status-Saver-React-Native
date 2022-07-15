@@ -6,19 +6,20 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { StatusImageProps } from "../models/interface";
+import { StatusItemProps } from "../models/interface";
 import { statusImages } from "../styles/styles";
 import * as FileSystem from "expo-file-system";
 import { FontAwesome } from "@expo/vector-icons";
-import {
-  ImageStatusAlbumName,
-  WHATSAPPDEFAULTCOLOUR,
-} from "../utils/constants";
+import { WHATSAPPDEFAULTCOLOUR } from "../utils/constants";
 import { AntDesign } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import * as MediaLibrary from "expo-media-library";
 
-const StatusImages: React.FC<StatusImageProps> = ({ assetUri }) => {
+const StatusItem: React.FC<StatusItemProps> = ({
+  itemUri,
+  itemType,
+  albumName,
+}) => {
   const [isSaveMode, setIsSavingMode] = useState<boolean>(false);
   const [toSaveUri, setToSaveUri] = useState<string[]>([]);
   const [status, requestPermission] = MediaLibrary.usePermissions();
@@ -44,29 +45,29 @@ const StatusImages: React.FC<StatusImageProps> = ({ assetUri }) => {
     }
   };
 
-  let imageCacheFolderUri: string;
-  const getImageCacheFilesUri = async () => {
+  let itemCacheFolderUri: string;
+  const getItemCacheFilesUri = async () => {
     const cacheDirUri = FileSystem.cacheDirectory!;
-    const relativePath = "WHATSAPP/STATUS/IMAGES";
-    imageCacheFolderUri = cacheDirUri + relativePath;
+    const relativePath = `WHATSAPP/STATUS/${itemType}`;
+    itemCacheFolderUri = cacheDirUri + relativePath;
+
     try {
-      await FileSystem.deleteAsync(imageCacheFolderUri);
+      await FileSystem.deleteAsync(itemCacheFolderUri);
     } catch (e) {
       console.log(e);
     }
+
     toSaveUri.forEach(async (uri: string) => {
       await FileSystem.copyAsync({
         from: uri,
-        to: `${imageCacheFolderUri}`,
+        to: `${itemCacheFolderUri}`,
       });
     });
 
-    const imageCacheFiles = await FileSystem.readDirectoryAsync(
-      imageCacheFolderUri
+    const itemCacheFiles = await FileSystem.readDirectoryAsync(
+      itemCacheFolderUri
     );
-    return imageCacheFiles.map(
-      (uri: string) => `${imageCacheFolderUri}/${uri}`
-    );
+    return itemCacheFiles.map((uri: string) => `${itemCacheFolderUri}/${uri}`);
   };
 
   const saveContent = async () => {
@@ -80,33 +81,36 @@ const StatusImages: React.FC<StatusImageProps> = ({ assetUri }) => {
         }
       }
 
-      const imageCacheFilesUri = await getImageCacheFilesUri();
-      if (imageCacheFilesUri.length) {
+      const itemCacheFilesUri = await getItemCacheFilesUri();
+      if (itemCacheFilesUri.length) {
         let createdAssets: MediaLibrary.Asset[] = [];
-        for (let uri of imageCacheFilesUri) {
+        for (let uri of itemCacheFilesUri) {
           const newAsset = await MediaLibrary.createAssetAsync(uri);
           createdAssets.push(newAsset);
         }
 
-        let album = await MediaLibrary.getAlbumAsync(ImageStatusAlbumName);
+        console.log("hit2", createdAssets);
+
+        let album = await MediaLibrary.getAlbumAsync(albumName);
         if (!album) {
           //false=>move assets, don't copy
           album = await MediaLibrary.createAlbumAsync(
-            ImageStatusAlbumName,
+            albumName,
             createdAssets[0],
             true
           );
+          await MediaLibrary.deleteAssetsAsync([createdAssets[0]]);
           createdAssets.shift();
         }
-
+        console.log("hit1", createdAssets);
         await MediaLibrary.addAssetsToAlbumAsync(createdAssets, album, true);
         await MediaLibrary.deleteAssetsAsync(createdAssets);
-        await FileSystem.deleteAsync(imageCacheFolderUri);
+        await FileSystem.deleteAsync(itemCacheFolderUri);
       }
       cancelSave();
     } catch (e) {
       console.log(e);
-      FileSystem.deleteAsync(imageCacheFolderUri);
+      FileSystem.deleteAsync(itemCacheFolderUri);
       cancelSave();
       const err = new Error();
       console.log(err.stack);
@@ -114,10 +118,10 @@ const StatusImages: React.FC<StatusImageProps> = ({ assetUri }) => {
   };
 
   const changeMarking = () => {
-    if (assetUri.length === toSaveUri.length) {
+    if (itemUri.length === toSaveUri.length) {
       cancelSave();
     } else {
-      setToSaveUri([...assetUri]);
+      setToSaveUri([...itemUri]);
     }
   };
 
@@ -127,12 +131,12 @@ const StatusImages: React.FC<StatusImageProps> = ({ assetUri }) => {
   };
 
   return (
-    <>
+    <View>
       {isSaveMode ? (
         <View style={[statusImages.allSaveOptionsView]}>
           <View>
             <TouchableWithoutFeedback onPress={() => changeMarking()}>
-              {assetUri.length == toSaveUri.length ? (
+              {itemUri.length == toSaveUri.length ? (
                 <View style={statusImages.optionView}>
                   <AntDesign name="checkcircle" size={24} color="black" />
                   <Text>Unmark All</Text>
@@ -161,7 +165,7 @@ const StatusImages: React.FC<StatusImageProps> = ({ assetUri }) => {
       ) : null}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={statusImages.contentView}>
-          {assetUri.map((uri: string, idx: number) => {
+          {itemUri.map((uri: string, idx: number) => {
             return (
               <View key={idx}>
                 <TouchableWithoutFeedback
@@ -170,13 +174,7 @@ const StatusImages: React.FC<StatusImageProps> = ({ assetUri }) => {
                   }}
                   onLongPress={() => startSavingMode(uri)}
                 >
-                  <View
-                    style={
-                      toSaveUri.includes(uri)
-                        ? statusImages.touchedImageView
-                        : statusImages.touchableImageView
-                    }
-                  >
+                  <View>
                     {toSaveUri.includes(uri) ? (
                       <FontAwesome
                         style={statusImages.markedIcon}
@@ -200,8 +198,8 @@ const StatusImages: React.FC<StatusImageProps> = ({ assetUri }) => {
           })}
         </View>
       </ScrollView>
-    </>
+    </View>
   );
 };
 
-export default StatusImages;
+export default StatusItem;

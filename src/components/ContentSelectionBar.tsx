@@ -6,14 +6,14 @@ import { contentSelectionBar } from "../styles/styles";
 
 const ContentSelectionBar: React.FC<ContentSelectionBarProps> = ({
   content,
-  changeContent,
+  handleChangeContent,
 }) => {
   return (
     <View style={contentSelectionBar.contentSelectionBarView}>
-      <TouchableWithoutFeedback onPress={() => changeContent("image")}>
+      <TouchableWithoutFeedback onPress={() => handleChangeContent("images")}>
         <View
           style={
-            content === "image"
+            content === "images"
               ? [
                   contentSelectionBar.contentSelectionBarBtn,
                   contentSelectionBar.activeBtnStyle,
@@ -26,12 +26,12 @@ const ContentSelectionBar: React.FC<ContentSelectionBarProps> = ({
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback
         onPress={() => {
-          changeContent("video");
+          handleChangeContent("videos");
         }}
       >
         <View
           style={
-            content === "video"
+            content === "videos"
               ? [
                   contentSelectionBar.contentSelectionBarBtn,
                   contentSelectionBar.activeBtnStyle,
