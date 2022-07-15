@@ -26,7 +26,9 @@
         "backgroundColor": "#FFFFFF"
       },
       "permissions": [
+        "CAMERA",
         "ACCESS_FILE_LOCATION",
+        "RECORD_AUDIO",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.ACCESS_MEDIA_LOCATION"
@@ -39,8 +41,8 @@
       [
         "expo-media-library",
         {
-          "photosPermission": "Allow Untap to access your photos.",
-          "savePhotosPermission": "Allow Untap to save photos.",
+          "photosPermission": "Please allow ${PRODUCT_NAME} to access your photos.",
+          "savePhotosPermission": "Please allow ${PRODUCT_NAME} to save photos.",
           "isAccessMediaLocationEnabled": "true"
         }
       ]
