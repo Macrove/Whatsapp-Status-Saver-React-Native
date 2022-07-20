@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Image,
+  RefreshControl,
   ScrollView,
   Text,
   TouchableWithoutFeedback,
@@ -14,15 +15,25 @@ import { WHATSAPPDEFAULTCOLOUR } from "../utils/constants";
 import { AntDesign } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import * as MediaLibrary from "expo-media-library";
+import { wait } from "../utils/wait";
 
 const StatusItem: React.FC<StatusItemProps> = ({
   itemUri,
   itemType,
   albumName,
+  handleDisplayMessage,
+  handleRefresh,
 }) => {
   const [isSaveMode, setIsSavingMode] = useState<boolean>(false);
   const [toSaveUri, setToSaveUri] = useState<string[]>([]);
   const [status, requestPermission] = MediaLibrary.usePermissions();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    handleRefresh();
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
 
   const startSavingMode = (uri: string) => {
     if (!isSaveMode) {
@@ -88,9 +99,6 @@ const StatusItem: React.FC<StatusItemProps> = ({
           const newAsset = await MediaLibrary.createAssetAsync(uri);
           createdAssets.push(newAsset);
         }
-
-        console.log("hit2", createdAssets);
-
         let album = await MediaLibrary.getAlbumAsync(albumName);
         if (!album) {
           //false=>move assets, don't copy
@@ -102,10 +110,10 @@ const StatusItem: React.FC<StatusItemProps> = ({
           await MediaLibrary.deleteAssetsAsync([createdAssets[0]]);
           createdAssets.shift();
         }
-        console.log("hit1", createdAssets);
         await MediaLibrary.addAssetsToAlbumAsync(createdAssets, album, true);
         await MediaLibrary.deleteAssetsAsync(createdAssets);
         await FileSystem.deleteAsync(itemCacheFolderUri);
+        handleDisplayMessage("Saved Assets Successfully");
       }
       cancelSave();
     } catch (e) {
@@ -163,7 +171,12 @@ const StatusItem: React.FC<StatusItemProps> = ({
           </TouchableWithoutFeedback>
         </View>
       ) : null}
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View style={statusImages.contentView}>
           {itemUri.map((uri: string, idx: number) => {
             return (

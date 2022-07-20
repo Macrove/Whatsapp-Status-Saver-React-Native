@@ -11,6 +11,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#e8e1e1",
   },
+  displayMessage: {
+    // width: window.width / 2,
+    // height: 100,
+    position: "absolute",
+    alignSelf: "center",
+    alignContent: "center",
+    justifyContent: "center",
+    top: 700,
+  },
 });
 
 const contentSelectionBar = StyleSheet.create({
@@ -86,4 +95,20 @@ const statusImages = StyleSheet.create({
   },
 });
 
-export { styles, contentSelectionBar, loading, statusImages };
+const displayMessage = StyleSheet.create({
+  displayMessageView: {
+    width: window.width / 2,
+    height: 35,
+    backgroundColor: "#9d9e9d",
+    // borderWidth: 1,
+    zIndex: 1,
+    borderRadius: 15,
+    justifyContent: "center",
+  },
+  text: {
+    color: "white",
+    textAlign: "center",
+  },
+});
+
+export { styles, contentSelectionBar, loading, statusImages, displayMessage };

@@ -1,6 +1,10 @@
 import { StorageAccessFramework } from "expo-file-system";
 import { useEffect, useRef, useState } from "react";
-import { ContentSelectionBarProps, StatusItemProps } from "../models/interface";
+import {
+  ContentDisplayProps,
+  ContentSelectionBarProps,
+  StatusItemProps,
+} from "../models/interface";
 import {
   ImageStatusAlbumName,
   VideoStatusAlbumName,
@@ -18,7 +22,9 @@ import {
 import StatusItem from "./StatusItem";
 import ContentSelectionBar from "./ContentSelectionBar";
 
-const ContentDisplay: React.FC = ({}) => {
+const ContentDisplay: React.FC<ContentDisplayProps> = ({
+  handleDisplayMessage,
+}) => {
   const [whatsappImageUri, setWhatsappImageUri] = useState<string[]>([]);
   const [whatsappVidUri, setWhatsappVidUri] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -43,6 +49,7 @@ const ContentDisplay: React.FC = ({}) => {
 
   const getStatusMedia = async () => {
     try {
+      console.log("getting");
       const assets = await StorageAccessFramework.readDirectoryAsync(
         WHATSAPPSTATUSDIRECTORY
       );
@@ -63,7 +70,6 @@ const ContentDisplay: React.FC = ({}) => {
       console.log(e);
     }
   };
-
   useEffect(() => {
     setToShowLoading(isLoading || !oneSecPassed);
   }, [oneSecPassed, isLoading]);
@@ -99,6 +105,8 @@ const ContentDisplay: React.FC = ({}) => {
         albumName={item.albumName}
         itemType={item.itemType}
         itemUri={item.itemUri}
+        handleDisplayMessage={(msg: string) => handleDisplayMessage(msg)}
+        handleRefresh={() => getStatusMedia()}
       />
     </View>
   );
@@ -128,6 +136,7 @@ const ContentDisplay: React.FC = ({}) => {
         onViewableItemsChanged={onViewRef.current}
         // initialNumToRender={20}
         windowSize={20}
+        showsHorizontalScrollIndicator={false}
       />
     </View>
   );
