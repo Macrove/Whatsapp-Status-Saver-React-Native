@@ -21,7 +21,17 @@ const styles = StyleSheet.create({
     top: 700,
   },
 });
-
+const contentDisplay = StyleSheet.create({
+  contentSelectionBarView: {
+    top: -20,
+    // borderWidth: 1,
+    width: window.width,
+    height: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: WHATSAPPDEFAULTCOLOUR,
+  },
+});
 const contentSelectionBar = StyleSheet.create({
   contentSelectionBarView: {
     width: window.width - 100,
@@ -30,13 +40,14 @@ const contentSelectionBar = StyleSheet.create({
     justifyContent: "space-around",
   },
   contentSelectionBarBtn: {
+    top: 10,
     width: "30%",
     height: 50,
     justifyContent: "center",
     alignItems: "center",
   },
   activeBtnStyle: {
-    borderBottomColor: WHATSAPPDEFAULTCOLOUR,
+    borderBottomColor: "white",
     borderBottomWidth: 2,
   },
 });
@@ -111,4 +122,11 @@ const displayMessage = StyleSheet.create({
   },
 });
 
-export { styles, contentSelectionBar, loading, statusImages, displayMessage };
+export {
+  styles,
+  contentSelectionBar,
+  loading,
+  statusImages,
+  displayMessage,
+  contentDisplay,
+};

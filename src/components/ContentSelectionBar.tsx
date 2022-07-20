@@ -21,7 +21,7 @@ const ContentSelectionBar: React.FC<ContentSelectionBarProps> = ({
               : contentSelectionBar.contentSelectionBarBtn
           }
         >
-          <Entypo name="image" size={24} color="black" />
+          <Entypo name="image" size={24} color="#f0f0f0" />
         </View>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback
@@ -39,7 +39,7 @@ const ContentSelectionBar: React.FC<ContentSelectionBarProps> = ({
               : contentSelectionBar.contentSelectionBarBtn
           }
         >
-          <Feather name="video" size={24} color="black" />
+          <Feather name="video" size={24} color="#f0f0f0" />
         </View>
       </TouchableWithoutFeedback>
     </View>

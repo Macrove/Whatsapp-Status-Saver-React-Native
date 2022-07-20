@@ -8,7 +8,7 @@ import { wait } from "../utils/wait";
 const Home: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const opacityVal = useRef(new Animated.Value(0)).current;
 
   const handleDisplayMessage = async (message: string) => {
     setMessage(message);
@@ -20,7 +20,7 @@ const Home: React.FC = () => {
   };
 
   const fadeIn = () => {
-    Animated.timing(fadeAnim, {
+    Animated.timing(opacityVal, {
       toValue: 1,
       duration: 800,
       useNativeDriver: true,
@@ -28,7 +28,7 @@ const Home: React.FC = () => {
   };
 
   const fadeOut = () => {
-    Animated.timing(fadeAnim, {
+    Animated.timing(opacityVal, {
       toValue: 0,
       duration: 500,
       useNativeDriver: true,
@@ -42,7 +42,7 @@ const Home: React.FC = () => {
       />
 
       {message ? (
-        <Animated.View style={[styles.displayMessage, { opacity: fadeAnim }]}>
+        <Animated.View style={[styles.displayMessage, { opacity: opacityVal }]}>
           <DisplayMessage message={message} />
         </Animated.View>
       ) : null}

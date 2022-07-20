@@ -21,6 +21,7 @@ import {
 } from "react-native";
 import StatusItem from "./StatusItem";
 import ContentSelectionBar from "./ContentSelectionBar";
+import { contentDisplay } from "../styles/styles";
 
 const ContentDisplay: React.FC<ContentDisplayProps> = ({
   handleDisplayMessage,
@@ -113,10 +114,12 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
 
   return (
     <View style={{ alignItems: "center" }}>
-      <ContentSelectionBar
-        content={displayContent}
-        handleChangeContent={handleChangeContent}
-      />
+      <View style={contentDisplay.contentSelectionBarView}>
+        <ContentSelectionBar
+          content={displayContent}
+          handleChangeContent={handleChangeContent}
+        />
+      </View>
       <FlatList
         ref={flatListRef}
         data={DATA}
