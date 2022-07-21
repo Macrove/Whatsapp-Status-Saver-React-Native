@@ -1,5 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  Animated,
   Image,
   RefreshControl,
   ScrollView,
@@ -29,16 +30,66 @@ const StatusItem: React.FC<StatusItemProps> = ({
   const [status, requestPermission] = MediaLibrary.usePermissions();
   const [refreshing, setRefreshing] = useState(false);
 
+  const saveModeAnimation = useRef({
+    scaleYInitialValue: 0,
+    scaleYFinalValue: 1,
+    finalSaveBarHeight: 60,
+    scrollViewInitialTop: -60,
+    scrollViewFinalTop: 0,
+    duration: 200,
+  }).current;
+
+  const scaleYAnim = useRef(
+    new Animated.Value(saveModeAnimation.scaleYInitialValue)
+  ).current;
+  const scrollViewDropAnim = useRef(
+    new Animated.Value(saveModeAnimation.scrollViewInitialTop)
+  ).current;
+
+  const saveBarDropAnim = () => {
+    Animated.timing(scaleYAnim, {
+      toValue: saveModeAnimation.scaleYFinalValue,
+      duration: saveModeAnimation.duration,
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(scrollViewDropAnim, {
+      toValue: saveModeAnimation.scrollViewFinalTop,
+      duration: saveModeAnimation.duration,
+      useNativeDriver: true,
+    }).start();
+  };
+  const saveBarRiseAnim = () => {
+    Animated.timing(scaleYAnim, {
+      toValue: saveModeAnimation.scaleYInitialValue,
+      duration: saveModeAnimation.duration,
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(scrollViewDropAnim, {
+      toValue: saveModeAnimation.scrollViewInitialTop,
+      duration: saveModeAnimation.duration,
+      useNativeDriver: true,
+    }).start();
+  };
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     handleRefresh();
-    wait(2000).then(() => setRefreshing(false));
+    wait(1000).then(() => setRefreshing(false));
   }, []);
 
-  const startSavingMode = (uri: string) => {
+  useEffect(() => {
+    if (!isSaveMode) saveBarRiseAnim();
+    else saveBarDropAnim();
+  }, [isSaveMode]);
+
+  const startSavingMode = async (uri: string) => {
     if (!isSaveMode) {
       setToSaveUri([uri]);
       setIsSavingMode(true);
+      // saveBarDropAnim();
+      // console.log(scrollViewDropAnim);
+      // await wait(2000);
+      // console.log(scrollViewDropAnim);
     }
   };
 
@@ -47,7 +98,7 @@ const StatusItem: React.FC<StatusItemProps> = ({
       if (toSaveUri.includes(uri)) {
         const newToSaveUri = toSaveUri.filter((uri_: string) => uri_ != uri);
         if (newToSaveUri.length == 0) {
-          setIsSavingMode(false);
+          stopSave();
         }
         setToSaveUri(newToSaveUri);
       } else {
@@ -87,7 +138,7 @@ const StatusItem: React.FC<StatusItemProps> = ({
         await requestPermission();
         if (!status?.granted) {
           alert("Sorry! Can't service without permission.");
-          cancelSave();
+          stopSave();
           return;
         }
       }
@@ -115,11 +166,11 @@ const StatusItem: React.FC<StatusItemProps> = ({
         await FileSystem.deleteAsync(itemCacheFolderUri);
         handleDisplayMessage("Saved Assets Successfully");
       }
-      cancelSave();
+      stopSave();
     } catch (e) {
       console.log(e);
       FileSystem.deleteAsync(itemCacheFolderUri);
-      cancelSave();
+      stopSave();
       const err = new Error();
       console.log(err.stack);
     }
@@ -127,54 +178,72 @@ const StatusItem: React.FC<StatusItemProps> = ({
 
   const changeMarking = () => {
     if (itemUri.length === toSaveUri.length) {
-      cancelSave();
+      stopSave();
     } else {
       setToSaveUri([...itemUri]);
     }
   };
 
-  const cancelSave = () => {
+  const stopSave = async () => {
+    saveBarRiseAnim();
     setToSaveUri([]);
+    await wait(saveModeAnimation.duration);
     setIsSavingMode(false);
   };
 
   return (
     <View>
       {isSaveMode ? (
-        <View style={[statusImages.allSaveOptionsView]}>
-          <View>
-            <TouchableWithoutFeedback onPress={() => changeMarking()}>
-              {itemUri.length == toSaveUri.length ? (
+        <Animated.View
+          style={[
+            { height: saveModeAnimation.finalSaveBarHeight },
+            { transform: [{ scaleY: scaleYAnim }] },
+          ]}
+        >
+          <View style={statusImages.allSaveOptionsView}>
+            <View>
+              <TouchableWithoutFeedback onPress={() => changeMarking()}>
+                {itemUri.length == toSaveUri.length ? (
+                  <View style={statusImages.optionView}>
+                    <AntDesign name="checkcircle" size={24} color="black" />
+                    <Text>Unmark All</Text>
+                  </View>
+                ) : (
+                  <View style={statusImages.optionView}>
+                    <AntDesign name="checkcircleo" size={24} color="black" />
+                    <Text>Mark All</Text>
+                  </View>
+                )}
+              </TouchableWithoutFeedback>
+            </View>
+            <View>
+              <TouchableWithoutFeedback onPress={() => saveContent()}>
                 <View style={statusImages.optionView}>
-                  <AntDesign name="checkcircle" size={24} color="black" />
-                  <Text>Unmark All</Text>
+                  <AntDesign name="check" size={24} color="black" />
+                  <Text>Save</Text>
                 </View>
-              ) : (
+              </TouchableWithoutFeedback>
+            </View>
+            <View>
+              <TouchableWithoutFeedback onPress={() => stopSave()}>
                 <View style={statusImages.optionView}>
-                  <AntDesign name="checkcircleo" size={24} color="black" />
-                  <Text>Mark All</Text>
+                  <Entypo name="cross" size={24} color="black" />
+                  <Text>Cancel</Text>
                 </View>
-              )}
-            </TouchableWithoutFeedback>
+              </TouchableWithoutFeedback>
+            </View>
           </View>
-          <TouchableWithoutFeedback onPress={() => saveContent()}>
-            <View style={statusImages.optionView}>
-              <AntDesign name="check" size={24} color="black" />
-              <Text>Save</Text>
-            </View>
-          </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback onPress={() => cancelSave()}>
-            <View style={statusImages.optionView}>
-              <Entypo name="cross" size={24} color="black" />
-              <Text>Cancel</Text>
-            </View>
-          </TouchableWithoutFeedback>
-        </View>
+        </Animated.View>
       ) : null}
-      <ScrollView
+      <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        style={
+          isSaveMode
+            ? [{ top: 0 }, { transform: [{ translateY: scrollViewDropAnim }] }]
+            : null
         }
       >
         <View style={statusImages.contentView}>
@@ -210,7 +279,7 @@ const StatusItem: React.FC<StatusItemProps> = ({
             );
           })}
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 };

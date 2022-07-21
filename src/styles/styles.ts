@@ -93,7 +93,7 @@ const statusImages = StyleSheet.create({
   },
   allSaveOptionsView: {
     width: window.width - 100,
-    height: 60,
+    // height: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     alignSelf: "center",

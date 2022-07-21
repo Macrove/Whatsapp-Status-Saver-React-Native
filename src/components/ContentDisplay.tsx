@@ -50,7 +50,6 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
 
   const getStatusMedia = async () => {
     try {
-      console.log("getting");
       const assets = await StorageAccessFramework.readDirectoryAsync(
         WHATSAPPSTATUSDIRECTORY
       );
