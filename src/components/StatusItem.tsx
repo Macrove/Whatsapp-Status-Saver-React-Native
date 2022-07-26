@@ -161,8 +161,10 @@ const StatusItem: React.FC<StatusItemProps> = ({
           await MediaLibrary.deleteAssetsAsync([createdAssets[0]]);
           createdAssets.shift();
         }
-        await MediaLibrary.addAssetsToAlbumAsync(createdAssets, album, true);
-        await MediaLibrary.deleteAssetsAsync(createdAssets);
+        if (createdAssets.length) {
+          await MediaLibrary.addAssetsToAlbumAsync(createdAssets, album, true);
+          await MediaLibrary.deleteAssetsAsync(createdAssets);
+        }
         await FileSystem.deleteAsync(itemCacheFolderUri);
         handleDisplayMessage("Saved Assets Successfully");
       }

@@ -1,24 +1,13 @@
 import { StorageAccessFramework } from "expo-file-system";
 import { useEffect, useRef, useState } from "react";
-import {
-  ContentDisplayProps,
-  ContentSelectionBarProps,
-  StatusItemProps,
-} from "../models/interface";
+import { ContentDisplayProps } from "../models/interface";
 import {
   ImageStatusAlbumName,
   VideoStatusAlbumName,
-  WHATSAPPSTATUSDIRECTORY,
+  WHATSAPP_STATUS_DIRECTORY,
 } from "../utils/constants";
 import Loading from "./Loading";
-import {
-  Dimensions,
-  FlatList,
-  ScrollView,
-  SectionList,
-  Text,
-  View,
-} from "react-native";
+import { Dimensions, FlatList, PermissionsAndroid, View } from "react-native";
 import StatusItem from "./StatusItem";
 import ContentSelectionBar from "./ContentSelectionBar";
 import { contentDisplay } from "../styles/styles";
@@ -32,7 +21,7 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
   const [oneSecPassed, setOneSecPassed] = useState<boolean>(false);
   const [toShowLoading, setToShowLoading] = useState<boolean>(true);
   const [displayContent, setDisplayContent] = useState<string>("images");
-
+  const ispermissionGranted = useRef(false);
   const viewConfigRef = useRef({ itemVisiblePercentThreshold: 50 });
   const onViewRef = useRef((items: any) => {
     setDisplayContent(items.viewableItems[0].key);
@@ -48,12 +37,24 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
     });
   };
 
+  const getPermissions = async () => {
+    if (ispermissionGranted.current) return true;
+    const permission =
+      await StorageAccessFramework.requestDirectoryPermissionsAsync(
+        WHATSAPP_STATUS_DIRECTORY
+      );
+    ispermissionGranted.current = permission.granted;
+    return ispermissionGranted;
+  };
+
   const getStatusMedia = async () => {
     try {
-      const assets = await StorageAccessFramework.readDirectoryAsync(
-        WHATSAPPSTATUSDIRECTORY
-      );
-
+      let assets: string[] = [];
+      if (await getPermissions()) {
+        assets = await StorageAccessFramework.readDirectoryAsync(
+          WHATSAPP_STATUS_DIRECTORY
+        );
+      }
       const newImageUri: string[] = [],
         newVidUri: string[] = [];
 
@@ -64,9 +65,9 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
 
       setWhatsappImageUri(newImageUri);
       setWhatsappVidUri(newVidUri);
+
       setIsLoading(false);
     } catch (e) {
-      // setMessage("access denied")
       console.log(e);
     }
   };

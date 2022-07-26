@@ -28,12 +28,9 @@
         "backgroundColor": "#FFFFFF"
       },
       "permissions": [
-        "CAMERA",
         "ACCESS_FILE_LOCATION",
-        "RECORD_AUDIO",
         "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.ACCESS_MEDIA_LOCATION"
+        "android.permission.WRITE_EXTERNAL_STORAGE"
       ]
     },
     "web": {
@@ -46,6 +43,13 @@
           "photosPermission": "Please allow ${PRODUCT_NAME} to access your photos.",
           "savePhotosPermission": "Please allow ${PRODUCT_NAME} to save photos.",
           "isAccessMediaLocationEnabled": "true"
+        }
+      ],
+      [
+        "expo-file-system",
+        {
+          "READ_EXTERNAL_STORAGE_PERMISSION": "Please allow ${PRODUCT_NAME} to access your external storage",
+          "WRITE_EXTERNAL_STORAGE_PERMISSION": "Please allow ${PRODUCT_NAME} to access your external storage"
         }
       ]
     ]
